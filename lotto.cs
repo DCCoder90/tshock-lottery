@@ -6,16 +6,19 @@ using Terraria;
 using TShockAPI;
 using Hooks;
 
-namespace Flogoff
+namespace Lotto
 {
     [APIVersion(1, 11)]
 
     public class Lotto : TerrariaPlugin
     {
         public static bool lottostatus;
+        public static bool removewinner = true;
         public static int winnings;
+        public static string[] players;
         public static int odds;
-        public static List<string> items = new List<string>;
+        public static List<string> items = new List<string>();
+        public static List<int> playerindex = new List<int>();
 
         public override Version Version
         {
@@ -34,21 +37,55 @@ namespace Flogoff
 
         public override string Description
         {
-            get { return "Allows for a radom lottery!"; }
+            get { return "Allows for a random lottery!"; }
         }
 
         public Lotto(Main game)
             : base(game)
         {
-            Order = -1;
+            Order = 4;
         }
 
         public override void Initialize()
         {
-            //Hooks.ServerHooks.Chat += OnChat;
-            //NetHooks.SendData += OnSendData;
             Commands.ChatCommands.Add(new Command("lotto", lotto, "lotto"));
-            //Commands.ChatCommands.Add(new Command("flogoff", flogoff, "flogoff"));
+        }
+
+
+        public void OnGreetPlayer(int who, HandledEventArgs e)
+        {
+            Lotto.playerindex.Add(who);
+            //Lotto.players[who] = "playername";
+        }
+
+        public void OnLeave(int ply)
+        {
+            Lotto.playerindex.Remove(ply);
+            Lotto.players[ply] = "";
+        }
+
+        public static void drawing()
+        {
+            int r, winner, t;
+            string item;
+            Random rand, rand2;
+
+            rand=new Random();
+            rand2 = new Random();
+
+            r = rand.Next(Lotto.playerindex.Count);
+            winner=Lotto.playerindex[r];
+
+            t = rand.Next(Lotto.items.Count);
+            item = Lotto.items[t];
+
+            if (removewinner)
+            {
+                Lotto.playerindex.Remove(winner);
+            }
+
+            //Get player by index
+            //TSPlayer winn=TShock.Utils.
         }
 
         protected void lotto(CommandArgs args)
@@ -86,19 +123,37 @@ namespace Flogoff
                 break;
 
                 case "add":
-                    //string item;
                     var items = TShock.Utils.GetItemByIdOrName(param);
                     if (items.Count == 0)
                     {
-                        args.Player.SendMessage("Invalid item type!", Color.Red);
+                        player.SendMessage("Invalid item type!", Color.Red);
+                        break;
                     }
                     else if (items.Count > 1)
                     {
-                        args.Player.SendMessage(string.Format("More than one ({0}) item matched!", items.Count), Color.Red);
+                        player.SendMessage(string.Format("More than one ({0}) item matched!", items.Count), Color.Red);
+                        break;
                     }
+                    var item=items[0];
+                    Lotto.items.Add(item.name);
+                    player.SendMessage(string.Format("Item {0} added to lottery winnings!",item.name));
                 break;
 
                 case "remove":
+                    var itemsr = TShock.Utils.GetItemByIdOrName(param);
+                    if (itemsr.Count == 0)
+                    {
+                        player.SendMessage("Invalid item type!", Color.Red);
+                        break;
+                    }
+                    else if (itemsr.Count > 1)
+                    {
+                        player.SendMessage(string.Format("More than one ({0}) item matched!", itemsr.Count), Color.Red);
+                        break;
+                    }
+                    var itemr=itemsr[0];
+                    Lotto.items.Remove(itemr.name);
+                    player.SendMessage(string.Format("Item {0} removed from lottery winnings!",itemr.name));
                 break;
 
                 case "win":
@@ -124,16 +179,5 @@ namespace Flogoff
             }
 
         }
-
-
-        /*protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                Hooks.ServerHooks.Chat -= OnChat;
-                NetHooks.SendData -= OnSendData;
-            }
-            base.Dispose(disposing);
-        }*/
     }
 }
