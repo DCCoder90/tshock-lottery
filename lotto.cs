@@ -146,6 +146,7 @@ namespace Lotto
                     player.SendMessage("Usage: /lotto remove [item] - Removes an item from the lottery winnings");
                     player.SendMessage("Usage: /lotto win [1-9] - Number of items to give to winner");
                     player.SendMessage("Usage: /lotto odds [0-9] - Odds the lottery will be triggered");
+                    player.SendMessage("Usage: /lotto mwin [bool] - Allow multiple winnings");
                 break;
 
                 case "status":
@@ -155,6 +156,7 @@ namespace Lotto
                     }else if(param=="false"){
                         lottostatus = false;
                     }
+                    player.SendMessage(string.Format("Lotter set to: {0}",lottostatus));
                 break;
 
                 case "add":
@@ -199,6 +201,13 @@ namespace Lotto
                         break;
                     }
                     Lotto.winnings = win;
+                    player.SendMessage(string.Format("Winning odds set to: {0}", winnings));
+                break;
+
+                case "mwin":
+                    bool bwin = Convert.ToBoolean(param);
+                    Lotto.removewinner = bwin;
+                    player.SendMessage(string.Format("Multiple winnings set to: {0}", removewinner));
                 break;
 
                 case "odds":
@@ -209,6 +218,7 @@ namespace Lotto
                         break;
                     }
                     Lotto.odds = odds;
+                    player.SendMessage(string.Format("Lottery odds set to: {0}", odds));
                 break;
                     
             }
