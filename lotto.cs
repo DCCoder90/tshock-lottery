@@ -60,13 +60,25 @@ namespace Lotto
         public override void Initialize()
         {
             Commands.ChatCommands.Add(new Command("lotto", lotto, "lotto"));
+            NetHooks.GreetPlayer += OnGreetPlayer;
+            ServerHooks.Leave += OnLeave;
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                NetHooks.GreetPlayer -= OnGreetPlayer;
+                ServerHooks.Leave -= OnLeave;
+            }
+            base.Dispose(disposing);
+        }
 
         public void OnGreetPlayer(int who, HandledEventArgs e)
         {
             Lotto.playerindex.Add(who);
-            //Lotto.players[who] = "playername";
+            var plr=new TSPlayer(who);
+            Lotto.players[who] = plr.Name;
         }
 
         public void OnLeave(int ply)
@@ -99,8 +111,12 @@ namespace Lotto
                 Lotto.playerindex.Remove(winner);
             }
 
-            //Get player by index
-            //TSPlayer winn=TShock.Utils.
+            var winneritem = TShock.Utils.GetItemByIdOrName(item);
+            var wwitem = winneritem[0];
+            TSPlayer plr = new TSPlayer(winner);
+
+            plr.GiveItem(wwitem.type, wwitem.name, wwitem.width, wwitem.height, 1);
+            TSPlayer.All.SendMessage(string.Format("{0} just won a {1} in the lottery!",plr.Name,wwitem.name));
         }
 
         #endregion
