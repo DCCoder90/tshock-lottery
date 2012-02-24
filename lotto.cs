@@ -12,6 +12,9 @@ namespace Lotto
 
     public class Lotto : TerrariaPlugin
     {
+
+        #region Variables
+
         public static bool lottostatus;
         public static bool removewinner = true;
         public static int winnings;
@@ -19,6 +22,10 @@ namespace Lotto
         public static int odds;
         public static List<string> items = new List<string>();
         public static List<int> playerindex = new List<int>();
+
+        #endregion
+
+        #region Information
 
         public override Version Version
         {
@@ -40,11 +47,15 @@ namespace Lotto
             get { return "Allows for a random lottery!"; }
         }
 
+        #endregion
+
         public Lotto(Main game)
             : base(game)
         {
             Order = 4;
         }
+
+        #region Initialization
 
         public override void Initialize()
         {
@@ -63,6 +74,10 @@ namespace Lotto
             Lotto.playerindex.Remove(ply);
             Lotto.players[ply] = "";
         }
+
+        #endregion
+
+        #region Lottery
 
         public static void drawing()
         {
@@ -87,6 +102,10 @@ namespace Lotto
             //Get player by index
             //TSPlayer winn=TShock.Utils.
         }
+
+        #endregion
+
+        #region Commands
 
         protected void lotto(CommandArgs args)
         {
@@ -179,5 +198,7 @@ namespace Lotto
             }
 
         }
+
+        #endregion
     }
 }
